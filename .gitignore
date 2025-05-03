@@ -1,0 +1,45 @@
+# Dependências e builds
+/dist
+/node_modules
+/.cache
+/.nest
+
+# Ambiente e variáveis
+.env
+.env.*
+!.env.example
+
+# Prisma
+/prisma/migrations
+!prisma/migrations/migration_lock.toml
+
+# Uploads de arquivos
+/uploads
+*.tmp
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.idea
+.vscode
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Testes
+/coverage
+.nyc_output
+
+# Documentação
+/docs
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
