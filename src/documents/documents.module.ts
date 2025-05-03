@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { DocumentsService } from './documents.service';
 import { DocumentsController } from './documents.controller';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuthModule } from '../auth/auth.module'; 
-import { OcrModule } from '../ocr/ocr.module';
-
+import { DocumentsService } from './documents.service';
+import { PrismaModule } from '../prisma/prisma.module';
+import { UsersModule } from '../users/users.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [AuthModule, OcrModule],
+  imports: [PrismaModule, UsersModule, JwtModule.register({})],
   controllers: [DocumentsController],
-  providers: [DocumentsService, PrismaService],
+  providers: [DocumentsService],
+  exports: [DocumentsService]
 })
 export class DocumentsModule {}
