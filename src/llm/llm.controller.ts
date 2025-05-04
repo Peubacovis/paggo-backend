@@ -6,8 +6,9 @@ import { LlmService } from './llm.service';
 export class LlmController {
   constructor(private readonly llmService: LlmService) {}
 
-  @Post('ask')
+  @Post('explain')
   async explain(@Body('text') text: string) {
-    return this.llmService.explainText(text);
+    const explanation = await this.llmService.explainText(text);
+    return { explanation };
   }
 }
