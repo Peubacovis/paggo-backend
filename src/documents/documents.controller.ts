@@ -10,6 +10,7 @@ import {
   Res,
   NotFoundException,
   Req,
+  Body,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DocumentsService } from './documents.service';
@@ -31,7 +32,7 @@ export class DocumentsController {
     private readonly usersService: UsersService,
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   @Get()
   @UseGuards(JwtAuthGuard)
@@ -94,6 +95,7 @@ export class DocumentsController {
       throw new BadRequestException(error.message || 'Erro ao enviar o documento');
     }
   }
+
   @Get('download-text/:filename')
   @UseGuards(JwtAuthGuard)
   async downloadText(
@@ -124,4 +126,22 @@ export class DocumentsController {
     res.send(extractedText);
   }
 
+  // Nova rota para explicar o conteúdo do documento
+  @Post('explain')
+  @UseGuards(JwtAuthGuard)
+  async explainDocument(@Body('text') text: string) {
+    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+      throw new BadRequestException('Texto inválido ou vazio');
+    }
+    try {
+      const explanation = await this.documentsService.explainDocument(text);
+      return {
+        success: true,
+        message: 'Explicação gerada com sucesso',
+        data: explanation,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Erro ao gerar explicação');
+    }
+  }
 }

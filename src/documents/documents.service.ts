@@ -1,12 +1,17 @@
-import * as fs from 'fs'; // Importando o módulo fs
-import * as path from 'path'; // Importando o módulo path
-import * as Tesseract from 'tesseract.js'; // Importando o Tesseract.js
-import { Injectable } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as Tesseract from 'tesseract.js';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { OpenAI } from 'openai';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class DocumentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject('OPENAI_API') private readonly openai: OpenAI, // <- Injeção do OpenAI
+  ) {}
 
   // Processa o upload do documento e realiza OCR na imagem
   async processUpload(userId: string, file: Express.Multer.File) {
@@ -31,7 +36,7 @@ export class DocumentsService {
       data: {
         userId,
         filename: file.originalname,
-        ocrText: extractedText, // Armazena o texto extraído no campo ocrText
+        ocrText: extractedText,
       },
     });
 
@@ -41,15 +46,10 @@ export class DocumentsService {
   // Método privado para extrair texto da imagem usando Tesseract.js
   private async extractTextFromImage(imagePath: string): Promise<string> {
     try {
-      // Usando o Tesseract.js para extrair texto da imagem
-      const { data } = await Tesseract.recognize(
-        imagePath,
-        'eng', // Linguagem do OCR, você pode mudar para 'por' para português
-        {
-          logger: (m) => console.log(m), // Para ver o progresso
-        }
-      );
-      return data.text; // Retorna o texto extraído da imagem
+      const { data } = await Tesseract.recognize(imagePath, 'eng', {
+        logger: (m) => console.log(m),
+      });
+      return data.text;
     } catch (error) {
       console.error('Erro ao processar a imagem:', error);
       throw new Error('Erro ao extrair texto da imagem');
@@ -76,7 +76,7 @@ export class DocumentsService {
       },
     });
   }
-  
+
   async findDocumentByFilenameAndUserId(filename: string, userId: string) {
     return await this.prisma.document.findFirst({
       where: {
@@ -85,6 +85,31 @@ export class DocumentsService {
       },
     });
   }
-  
 
+  // 🔥 NOVO MÉTODO: Explicar documento com base no texto extraído
+  async explainDocument(text: string): Promise<string> {
+    try {
+      // Verificando se o texto está vazio ou malformado
+      if (!text || typeof text !== 'string' || text.trim().length === 0) {
+        throw new BadRequestException('Texto inválido ou vazio');
+      }
+
+      console.log('Prompt enviado:', text);
+
+      // Chamando a OpenAI para explicar o texto
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-3.5-turbo', // ou 'gpt-3.5-turbo'
+        messages: [
+          { role: 'system', content: 'Você é um assistente inteligente.' },
+          { role: 'user', content: `Explique esse texto: ${text}` },
+        ],
+        temperature: 0.7,
+      });
+
+      return response.choices[0]?.message?.content ?? 'Não foi possível gerar a explicação.';
+    } catch (error) {
+      console.error('Erro detalhado:', JSON.stringify(error, null, 2));
+      throw new BadRequestException('Erro ao gerar explicação com a OpenAI');
+    }
+  }
 }
