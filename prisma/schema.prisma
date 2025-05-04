@@ -23,6 +23,7 @@ model Document {
   ocrText     String
   createdAt   DateTime @default(now())
   llmMessages LLMMessage[]
+  interactions   LLMInteraction[]  
 }
 
 model LLMMessage {
@@ -33,3 +34,13 @@ model LLMMessage {
   content     String
   createdAt   DateTime @default(now())
 }
+
+model LLMInteraction {
+  id          String   @id @default(uuid())
+  question    String
+  answer      String
+  document    Document @relation(fields: [documentId], references: [id])
+  documentId  String
+  createdAt   DateTime @default(now())
+}
+

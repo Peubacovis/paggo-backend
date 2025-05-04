@@ -22,6 +22,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { AskQuestionDto } from 'src/auth/dto/ask-question.dto';
 
 @ApiTags('documents')
 @ApiBearerAuth()
@@ -126,15 +127,17 @@ export class DocumentsController {
     res.send(extractedText);
   }
 
-  // Nova rota para explicar o conteúdo do documento
   @Post('explain')
   @UseGuards(JwtAuthGuard)
-  async explainDocument(@Body('text') text: string) {
-    if (!text || typeof text !== 'string' || text.trim().length === 0) {
-      throw new BadRequestException('Texto inválido ou vazio');
+  async explainDocument(@Body() askQuestionDto: AskQuestionDto) {
+    const { question } = askQuestionDto;
+
+    if (!question || typeof question !== 'string' || question.trim().length === 0) {
+      throw new BadRequestException('Pergunta inválida ou vazia');
     }
+
     try {
-      const explanation = await this.documentsService.explainDocument(text);
+      const explanation = await this.documentsService.explainDocument(question);
       return {
         success: true,
         message: 'Explicação gerada com sucesso',

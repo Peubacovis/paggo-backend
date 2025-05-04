@@ -108,6 +108,13 @@ export class DocumentsService {
 
       return response.choices[0]?.message?.content ?? 'Não foi possível gerar a explicação.';
     } catch (error) {
+      if (
+        error?.error?.code === 'insufficient_quota' ||
+        error?.message?.includes('insufficient_quota')
+      ) {
+        throw new BadRequestException('Sem créditos disponíveis na OpenAI. Verifique seu plano.');
+      }
+    
       console.error('Erro detalhado:', JSON.stringify(error, null, 2));
       throw new BadRequestException('Erro ao gerar explicação com a OpenAI');
     }
