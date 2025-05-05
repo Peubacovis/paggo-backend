@@ -13,8 +13,6 @@ model User {
   password  String
   createdAt DateTime   @default(now())
   document  Document[]
-
-   @@map("user")
 }
 
 model Document {
@@ -26,8 +24,6 @@ model Document {
   user         User             @relation(fields: [userId], references: [id])
   interactions LLMInteraction[]
   llmMessages  LLMMessage[]
-
-  @@map("document")
 }
 
 model LLMMessage {
@@ -37,8 +33,6 @@ model LLMMessage {
   content    String
   createdAt  DateTime @default(now())
   document   Document @relation(fields: [documentId], references: [id])
-
-   @@map("llmmessage")
 }
 
 model LLMInteraction {
@@ -48,6 +42,4 @@ model LLMInteraction {
   documentId String
   createdAt  DateTime @default(now())
   document   Document @relation(fields: [documentId], references: [id])
-
-  @@map("llminteraction")
 }
