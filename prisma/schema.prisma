@@ -26,6 +26,7 @@ model Document {
   user         User             @relation(fields: [userId], references: [id])
   interactions LLMInteraction[]
   llmMessages  LLMMessage[]
+  
   @@map("documents")
 }
 
