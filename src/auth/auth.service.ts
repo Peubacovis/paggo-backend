@@ -55,10 +55,12 @@ export class AuthService {
       sub: user.id,
     };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, {
+        expiresIn: '1h', // Ou pode ser um número, como 3600 (segundos)
+      }),
     };
   }
-
+  
   async getUserProfile(userId: string) {
     try {
       return await this.prisma.user.findUniqueOrThrow({
