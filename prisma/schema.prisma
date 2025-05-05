@@ -26,6 +26,7 @@ model Document {
   user         User             @relation(fields: [userId], references: [id])
   interactions LLMInteraction[]
   llmMessages  LLMMessage[]
+  @@map("documents")
 }
 
 model LLMMessage {
@@ -36,7 +37,7 @@ model LLMMessage {
   createdAt  DateTime @default(now())
   document   Document @relation(fields: [documentId], references: [id])
 
-  @@map("documents")
+  @@map("llmmessage")
 }
 
 model LLMInteraction {
@@ -47,7 +48,7 @@ model LLMInteraction {
   createdAt  DateTime @default(now())
   document   Document @relation(fields: [documentId], references: [id])
   
-  @@map("documents")
+  @@map("llminteraction")
 }
 
 
