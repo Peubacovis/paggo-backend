@@ -2,25 +2,28 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import helmet from 'helmet';  // Certifique-se de usar a importação correta
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Usando o helmet corretamente como middleware
-  app.use(helmet());  // O Helmet deve ser usado dessa maneira, como middleware
-
-  // Suporte a cookies (caso esteja usando autenticação com cookies)
+  app.use(helmet());
   app.use(cookieParser());
 
-  // CORS configurável via variável de ambiente
+  // Configuração do CORS corrigida
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: [
+      "https://paggo-frontend-rose.vercel.app",
+      "https://paggo-frontend-rose.vercel.app/login",
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   });
-  // Validações globais
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
