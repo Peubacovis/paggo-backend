@@ -124,7 +124,3 @@ Este backend usa a API da OpenAI para responder perguntas sobre os dados extraí
 
 ---
 
-## 📫 Contato
-
-Em caso de dúvidas, entre em contato com o desenvolvedor:
-**Pedro** - [LinkedIn](https://www.linkedin.com/) - [Email](mailto:seuemail@exemplo.com)
